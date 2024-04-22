@@ -104,6 +104,12 @@ function M.compile_colorscheme(config)
   if cmd_output:len() > 0 then
     print(cmd_output)
   end
+
+  local colorscheme = config.output:match "([^\\/]+)%.lua$"
+
+  if config.opts.generate and colorscheme == vim.g.colors_name then
+    vim.cmd.colorscheme(colorscheme)
+  end
 end
 
 ---@param config Colorscheme | string
