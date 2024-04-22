@@ -93,13 +93,17 @@ end
 function M.compile_colorscheme(config)
   config = M.expand_config(config, opts)
 
-  vim.fn.system {
+  local cmd_output = vim.fn.system {
     "colorgen-nvim",
     config.input,
     "--single-file",
     "--output",
     config.output,
   }
+
+  if cmd_output:len() > 0 then
+    print(cmd_output)
+  end
 end
 
 ---@param config Colorscheme | string
@@ -113,7 +117,6 @@ function M.register_colorscheme(config, run)
   end
 
   vim.api.nvim_create_autocmd("BufWritePost", {
-    pattern = config.input,
     group = autocmd_group,
     pattern = config.real_input,
     callback = function(_) M.compile_colorscheme(config) end,
