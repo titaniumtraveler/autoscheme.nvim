@@ -18,6 +18,7 @@ local autocmd_group = nil
 ---@class Colorscheme
 ---@field input string
 ---@field output string | nil
+---@field real_input string | nil
 ---@field opts ColorschemeOpts
 
 ---@class ColorschemeOpts
@@ -38,6 +39,7 @@ function M.expand_config(config, defaults)
 
   local input
   local output
+  local real_input
   defaults = vim.tbl_deep_extend("force", default_opts, defaults)
 
   if type(config) == "string" then
@@ -75,9 +77,14 @@ function M.expand_config(config, defaults)
 
   opts = vim.tbl_deep_extend("force", defaults, opts or {})
 
+  if type(config.real_input) == "nil" then
+    real_input = vim.loop.fs_realpath(input)
+  end
+
   return {
     input = input,
     output = output,
+    real_input = real_input,
     opts = opts,
   }
 end
@@ -108,6 +115,7 @@ function M.register_colorscheme(config, run)
   vim.api.nvim_create_autocmd("BufWritePost", {
     pattern = config.input,
     group = autocmd_group,
+    pattern = config.real_input,
     callback = function(_) M.compile_colorscheme(config) end,
   })
 
