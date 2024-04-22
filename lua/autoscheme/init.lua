@@ -118,10 +118,6 @@ function M.register_colorscheme(config, run)
   config = M.expand_config(config, opts)
   run = run or false
 
-  if type(autocmd_group) == "nil" then
-    autocmd_group = vim.api.nvim_create_augroup("autoscheme", { clear = true })
-  end
-
   vim.api.nvim_create_autocmd("BufWritePost", {
     group = autocmd_group,
     pattern = config.real_input,
@@ -141,6 +137,8 @@ function M.initialize()
   }
 
   opts = vim.tbl_deep_extend("force", default_opts, opts or {})
+
+  autocmd_group = vim.api.nvim_create_augroup("autoscheme-nvim", { clear = true })
 
   if type(o[1]) == "string" then
     local config = M.expand_config(o[1])
