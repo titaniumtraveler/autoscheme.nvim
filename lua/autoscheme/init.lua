@@ -17,19 +17,19 @@ local autocmd_group = nil
 
 ---@class Colorscheme
 ---@field input      string          input path
----@field output     string | nil    output path
----@field real_input string | nil    *secret* real input, where the input path is symlink resolved. Don't set manually!
+---@field output     string?         output path
+---@field real_input string?         *secret* real input, where the input path is symlink resolved. Don't set manually!
 ---@field opts       ColorschemeOpts
 
 ---@class ColorschemeOpts
----@field reload        boolean | nil reload colorscheme on compile (only if the colorscheme is currently active)
----@field autogenerate  boolean | nil regenerate colorscheme on change (using an autocommand)
----@field on_initialize boolean | nil generate colorschemes on initialize
----@field input_dir     string        directory in which to find the templates
----@field output_dir    string        directory in which to put the compiled
+---@field reload        boolean? reload colorscheme on compile (only if the colorscheme is currently active)
+---@field autogenerate  boolean? regenerate colorscheme on change (using an autocommand)
+---@field on_initialize boolean? generate colorschemes on initialize
+---@field input_dir     string   directory in which to find the templates
+---@field output_dir    string   directory in which to put the compiled
 
 ---@param config   Colorscheme     | string config to expand
----@param defaults ColorschemeOpts | nil    default options
+---@param defaults ColorschemeOpts?         default options
 ---@return Colorscheme
 function M.expand_config(config, defaults)
   vim.validate {
@@ -113,7 +113,7 @@ function M.compile_colorscheme(config)
 end
 
 ---@param config Colorscheme | string config to use to register the colorscheme
----@param run    boolean     | nil    whether to compile colorscheme after registering it. Defaults to false
+---@param run    boolean?             whether to compile colorscheme after registering it. Defaults to false
 function M.register_colorscheme(config, run)
   config = M.expand_config(config, opts)
   run = run or false
