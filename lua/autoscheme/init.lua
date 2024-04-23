@@ -121,6 +121,8 @@ function M.register_colorscheme(config, run)
   vim.api.nvim_create_autocmd("BufWritePost", {
     group = autocmd_group,
     pattern = config.real_input,
+    -- Execute nested autocommands. Needed for `vim.cmd.colorscheme()` to work properly!
+    nested = true,
     callback = function(_) M.compile_colorscheme(config) end,
   })
 
