@@ -121,10 +121,14 @@ function M.register_colorscheme(config, run)
   if config.opts.autogenerate then
     vim.api.nvim_create_autocmd("BufWritePost", {
       group = autocmd_group,
-      pattern = config.real_input,
+      pattern = "*.toml",
       -- Execute nested autocommands. Needed for `vim.cmd.colorscheme()` to work properly!
       nested = true,
-      callback = function(_) M.compile_colorscheme(config) end,
+      callback = function(event)
+        if vim.loop.fs_realpath(event.match) == config.real_input then
+          M.compile_colorscheme(config)
+        end
+      end,
     })
   end
 
