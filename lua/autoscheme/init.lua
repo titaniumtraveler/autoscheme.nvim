@@ -5,8 +5,8 @@ local util = require "autoscheme.util"
 ---@type ColorschemeOpts
 local default_opts = {
   reload = true,
-  generate = true,
-  on_startup = true,
+  autogenerate = true,
+  on_initialize = true,
   input_dir = vim.fn.stdpath "config",
   output_dir = util.get_package_path() .. "/colors",
 }
@@ -16,20 +16,20 @@ local opts = default_opts
 local autocmd_group = nil
 
 ---@class Colorscheme
----@field input string
----@field output string | nil
----@field real_input string | nil
----@field opts ColorschemeOpts
+---@field input      string          input path
+---@field output     string | nil    output path
+---@field real_input string | nil    *secret* real input, where the input path is symlink resolved. Don't set manually!
+---@field opts       ColorschemeOpts
 
 ---@class ColorschemeOpts
----@field reload boolean | nil
----@field generate boolean | nil
----@field on_startup boolean | nil
----@field input_dir string
----@field output_dir string
+---@field reload        boolean | nil reload colorscheme on compile (only if the colorscheme is currently active)
+---@field autogenerate  boolean | nil regenerate colorscheme on change (using an autocommand)
+---@field on_initialize boolean | nil generate colorschemes on initialize
+---@field input_dir     string        directory in which to find the templates
+---@field output_dir    string        directory in which to put the compiled
 
----@param config Colorscheme | string
----@param defaults ColorschemeOpts | nil
+---@param config   Colorscheme     | string config to expand
+---@param defaults ColorschemeOpts | nil    default options
 ---@return Colorscheme
 function M.expand_config(config, defaults)
   vim.validate {
@@ -89,7 +89,7 @@ function M.expand_config(config, defaults)
   }
 end
 
----@param config Colorscheme | string
+---@param config Colorscheme | string colorscheme to compile
 function M.compile_colorscheme(config)
   config = M.expand_config(config, opts)
 
@@ -107,24 +107,26 @@ function M.compile_colorscheme(config)
 
   local colorscheme = config.output:match "([^\\/]+)%.lua$"
 
-  if config.opts.generate and colorscheme == vim.g.colors_name then
+  if config.opts.reload and colorscheme == vim.g.colors_name then
     vim.cmd.colorscheme(colorscheme)
   end
 end
 
----@param config Colorscheme | string
----@param run boolean | nil
+---@param config Colorscheme | string config to use to register the colorscheme
+---@param run    boolean     | nil    whether to compile colorscheme after registering it. Defaults to false
 function M.register_colorscheme(config, run)
   config = M.expand_config(config, opts)
   run = run or false
 
-  vim.api.nvim_create_autocmd("BufWritePost", {
-    group = autocmd_group,
-    pattern = config.real_input,
-    -- Execute nested autocommands. Needed for `vim.cmd.colorscheme()` to work properly!
-    nested = true,
-    callback = function(_) M.compile_colorscheme(config) end,
-  })
+  if config.opts.autogenerate then
+    vim.api.nvim_create_autocmd("BufWritePost", {
+      group = autocmd_group,
+      pattern = config.real_input,
+      -- Execute nested autocommands. Needed for `vim.cmd.colorscheme()` to work properly!
+      nested = true,
+      callback = function(_) M.compile_colorscheme(config) end,
+    })
+  end
 
   if run then
     M.compile_colorscheme(config)
@@ -134,25 +136,28 @@ end
 function M.initialize()
   local o = vim.g.autoscheme
 
-  vim.validate {
-    colorschemes = { o[1], { "string", "table" }, defaults = { o.defaults, { "table", "nil" } } },
-  }
-
-  opts = vim.tbl_deep_extend("force", default_opts, opts or {})
-
   autocmd_group = vim.api.nvim_create_augroup("autoscheme-nvim", { clear = true })
 
-  if type(o[1]) == "string" then
-    local config = M.expand_config(o[1])
-    M.register_colorscheme(config, opts.on_startup)
-  elseif type(o[1]) == "table" then
-    for _, config in pairs(o[1]) do
-      vim.validate { colorscheme = { config, { "table", "string" } } }
-      M.register_colorscheme(config, opts.on_startup)
+  if type(o) ~= "nil" then
+    vim.validate {
+      colorschemes = { o[1], { "string", "table" }, defaults = { o.defaults, { "table", "nil" } } },
+    }
+
+    opts = vim.tbl_deep_extend("force", default_opts, opts or {})
+
+    if type(o[1]) == "string" then
+      local config = M.expand_config(o[1])
+      M.register_colorscheme(config, opts.on_initialize)
+    elseif type(o[1]) == "table" then
+      for _, config in pairs(o[1]) do
+        vim.validate { colorscheme = { config, { "table", "string" } } }
+        M.register_colorscheme(config, opts.on_initialize)
+      end
     end
   end
 end
 
+---@param config { [1]: Colorscheme[], defaults: ColorschemeOpts }
 function M.setup(config)
   vim.g.autoscheme = config
   M.initialize()
