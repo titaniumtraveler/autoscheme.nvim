@@ -83,3 +83,10 @@ While `colorgen-nvim` *does* support windows, this plugin does not,
 as it is written with Linux/Unix in mind.
 
 I might fix that at some point, but it is not really a priority for me.
+
+## License
+
+Licensed under either of Apache License, Version 2.0 or MIT license at your option.
+
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion by you,
+shall be dual licensed as above, without any additional terms or conditions.
