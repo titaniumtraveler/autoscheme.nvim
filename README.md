@@ -1,11 +1,10 @@
 # autoscheme.nvim
 
-Neovim Plugin to generate and automatically reload colorschemes using [colorgen-nvim](https://github.com/LunarVim/colorgen-nvim).
+Neovim Plugin to generate and automatically reload colorschemes using [`colorgen-nvim`](https://github.com/LunarVim/colorgen-nvim).
 
 ## Getting Started
 
-Install colorgen-nvim using `cargo install --branch pr/global-variables --git https://github.com/titaniumtraveler/colorgen-nvim`. \
-(This installs a fork with a few more features, that will hopefully be merged soon.)
+Install colorgen-nvim using `cargo install --git https://github.com/LunarVim/colorgen-nvim`.
 
 ## Configuration with `lazy.nvim`
 
