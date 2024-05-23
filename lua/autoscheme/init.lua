@@ -44,7 +44,7 @@ function M.expand_config(config, defaults)
 
   if type(config) == "string" then
     -- this won't work on windows
-    if config[1] == "/" then
+    if config:sub(1, 1) == "/" then
       input = config
     else
       -- this likely neither
