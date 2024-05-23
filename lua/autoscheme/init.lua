@@ -3,7 +3,7 @@ local M = {}
 local util = require "autoscheme.util"
 
 ---@type ColorschemeOpts
-local default_opts = {
+M.default_opts = {
   reload = true,
   autogenerate = true,
   on_initialize = true,
@@ -12,7 +12,7 @@ local default_opts = {
 }
 
 ---@type ColorschemeOpts
-local opts = default_opts
+local opts = M.default_opts
 local autocmd_group = nil
 
 ---@class Colorscheme
@@ -40,7 +40,7 @@ function M.expand_config(config, defaults)
   local input
   local output
   local real_input
-  defaults = vim.tbl_deep_extend("force", default_opts, defaults)
+  defaults = vim.tbl_deep_extend("force", M.default_opts, defaults or {})
 
   if type(config) == "string" then
     -- this won't work on windows
@@ -149,7 +149,7 @@ function M.initialize()
       colorschemes = { o[1], { "string", "table" }, defaults = { o.defaults, { "table", "nil" } } },
     }
 
-    opts = vim.tbl_deep_extend("force", default_opts, opts or {})
+    opts = vim.tbl_deep_extend("force", M.default_opts, opts or {})
 
     if type(o[1]) == "string" then
       local config = M.expand_config(o[1])
