@@ -77,7 +77,9 @@ function M.expand_config(config, defaults)
 
   opts = vim.tbl_deep_extend("force", defaults, opts or {})
 
-  if type(config.real_input) == "nil" then
+  if type(config.real_input) == "string" then
+    real_input = config.real_input
+  else
     real_input = vim.loop.fs_realpath(input)
   end
 
