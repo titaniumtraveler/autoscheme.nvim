@@ -95,6 +95,9 @@ end
 function M.compile_colorscheme(config)
   config = M.expand_config(config, opts)
 
+  ---@diagnostic disable-next-line:param-type-mismatch
+  vim.fn.mkdir(vim.fs.dirname(config.output), "p")
+
   local cmd_output = vim.fn.system {
     "colorgen-nvim",
     config.input,
